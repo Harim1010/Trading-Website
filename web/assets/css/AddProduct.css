@@ -1,0 +1,119 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
+*/
+/* 
+    Created on : Feb 21, 2024, 9:08:16 PM
+    Author     : Xuanphuc
+*/
+            * {
+                box-sizing: border-box;
+                padding: 0;
+                margin: 0; /* Remove default margin */
+            }
+            body {
+                background-color: rgba(0, 0, 0, 0.7);
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh; /* 100% viewport height */
+
+            }
+
+            .custom-container {
+                max-width: 800px;
+                background-color: #fff;
+                margin: 100px 0px;
+            }
+
+            .intermediary-order {
+                font-size: 20px;
+                font-weight: bold;
+                color: black;
+                padding: 10px;
+                margin-bottom: 20px;
+                border-bottom: 2px solid gray;
+            }
+
+            .form-row {
+                margin-bottom: 10px;
+            }
+
+            label {
+                font-size: 14px;
+            }
+
+            input[type="text"] {
+                font-size: 14px;
+            }
+
+            .btn {
+                font-size: 14px;
+            }
+            .fee-type-container {
+                display: flex;
+                background-color: #fff;
+                gap : 10px;
+            }
+
+            .fee-type-option {
+                flex: 1; /* Make each option flexible */
+            }
+
+            .fee-type-option input {
+                display: none;
+            }
+
+            .fee-type-option label {
+                background-color: #ddd;
+                padding: 10px;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+                border-radius: 8px;
+            }
+
+            .fee-type-option input:checked + label {
+                background-color: #0a58ca;
+                color: #fff;
+            }
+
+
+
+            .public-status-container {
+                display: flex;
+                background-color: #fff;
+                gap : 10px;
+            }
+
+            .public-status-option {
+                flex: 1; /* Make each option flexible */
+            }
+
+            .public-status-option input {
+                display: none;
+            }
+
+            .public-status-option label {
+                background-color: #ddd;
+                padding: 10px;
+                cursor: pointer;
+                width: 100%;
+                text-align: center;
+                border-radius: 8px;
+            }
+
+            .public-status-option input:checked + label {
+                background-color: #0a58ca;
+                color: #fff;
+            }
+            input[type=number]::-webkit-inner-spin-button,
+            input[type=number]::-webkit-outer-spin-button {
+                -webkit-appearance: none;
+                margin: 0;
+            }
+
+            /* Ẩn nút tăng/giảm cho trình duyệt Firefox */
+            input[type=number] {
+                -moz-appearance: textfield;
+            }  

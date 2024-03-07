@@ -1,0 +1,148 @@
+
+
+.modal_body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: Arial, sans-serif;
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+
+.modal_inner {
+    background: #fff;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.4);
+    padding: 30px;
+}
+
+/* Deposit form styling */
+.deposit-form {
+    width: 950px;
+    height: 400px;
+    justify-content: center;
+    align-items: center;
+}
+
+.deposit__header {
+    font-size: 1.5rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+}
+
+.deposit__body {
+    display: flex;
+    flex-direction: column;
+}
+
+button {
+    background-color: #c8ced3;
+    color: black;
+    padding: 10px;
+    margin: 5px 0;
+    border-radius: 3px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+    border: none;
+}
+
+button:hover {
+    background-color: #1985ac;
+    opacity: 0.9;
+}
+
+input {
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+input:focus {
+    border-color: #1985ac;
+}
+
+.deposit-form tr td {
+    padding-left: 50px;
+}
+
+.deposit__header {
+    text-align: center;
+    padding-bottom: 5px;
+    border-bottom: 1px solid #ccc;
+}
+
+input {
+    width: 646.85px;
+}
+
+.deposit {
+    text-align: center;
+}
+
+.description {
+    padding-bottom: 60px;
+}
+
+.des {
+    float: left;
+}
+
+td:first-child {
+    font-weight: bold;
+}
+
+.button1:focus,
+.button2:focus {
+    background-color: #1985ac;
+    color: aliceblue;
+    border-color: rgb(24, 118, 86);
+}
+
+.deposit button {
+    background-color: #4dbd74;
+    border-color: #4dbd74;
+}
+
+.deposit button:hover {
+    color: white;
+    background-color: #2d9251;
+}
+
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+}
+
+.button input {
+    display: none;
+}
+
+.button label {
+    background-color: #ddd;
+    padding: 10px;
+    cursor: pointer;
+    width: 100%;
+    text-align: center;
+    border-radius: 8px;
+}
+
+.button label {
+    font-size: small;
+}
+
+.button div {
+    display: flex;
+    width: 646.85px;
+}
+
+input[type="radio"]:checked + label {
+    background-color: #35bced;
+    color: aliceblue;
+    border-color: rgb(60, 138, 190);
+
+}
+

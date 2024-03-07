@@ -1,0 +1,118 @@
+/*
+Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+Click nbfs://nbhost/SystemFileSystem/Templates/ClientSide/css.css to edit this template
+*/
+/* 
+    Created on : Jan 22, 2024, 9:22:23 AM
+    Author     : User
+*/
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    min-height: 100vh;
+    display: flex;
+    align-times: center;
+    justify-content: center;
+    background: #4070f4;
+}
+.otpbox{
+    display:flex;
+    align-items: center;
+    justify-content: center;
+    background: #4070f4;
+    text-align: center;
+}
+
+.input-field {
+    display:flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+}
+.wrap {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: #fff;
+    padding: 30px 70px;
+    border-radius: 12px;
+    row-gap: 20px;
+    box-shadow: 0 5px 10px  rgba(0,0,0,0.1);
+}
+
+.optform {
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+.otpform .input-field {
+    flex-direction: row;
+    column-gap: 10px;
+}
+
+.input-field input {
+    height: 45px;
+    width: 42px;
+    border-radius: 6px;
+    outline: none;
+    text-align: center;
+    border: 1px solid #ddd;
+    font-size: 1.125rem;
+}
+
+.wrap header {
+    height: 65px;
+    width: 65px;
+    background-color: #4070f4;
+    color: #fff;
+    font-size: 2.5rem;
+    border-radius: 50%;
+}
+
+.wrap h4 {
+    font-size: 1.25rem;
+    color: #333;
+    font-weight: 500;
+}
+
+.otpform input{
+    height: 45px;
+    width: 42px;
+}
+
+.input-field input::-webkit-inner-spin-button,
+.input-field input::-webkit-outer-spin-button {
+    display: none;
+}
+
+.otpform button {
+    margin-top: 25px;
+    width: 100%;
+    background: #4070f4;
+    color: #fff;
+    font-size: 1rem;
+    border: none;
+    padding: 9px 0;
+    border-radius: 6px;
+    cursor: pointer;
+    background: #6e93f7;
+    transition: all 0.2s ease;
+    pointer-events: none;
+}
+
+.otpform button:hover{
+    background: #0e4bf1;
+}
+
+.otpform button.active {
+    background: #4070f4;
+    pointer-events: auto;
+}
+
+

@@ -1,0 +1,63 @@
+.container {
+    margin: 0 auto;
+}
+
+.clearfix {
+    width: 808.4px;
+    margin: 0 auto;
+}
+
+.text-muted {
+    color: white;
+    background-color: #66ccff;
+    text-align: center;
+    height: 50px;
+    padding-top: 2px;
+}
+
+.table-responsive tr {
+    display: flex;
+    justify-content: left;
+    justify-items: center;
+    text-align: left;
+    font-family: serif;
+    font-size: 20px;
+    border: 1px solid black;
+    width: 808.4px;
+    margin: 0 auto;
+}
+
+.form-group td:first-child {
+    padding-left: 50px;
+}
+
+.form-group td:last-child {
+    float: right;
+    color: #ff6666;
+    font-weight: bold;
+}
+
+#transaction_form {
+    border: 1px solid black;
+    padding: 20px;
+    width: 850px;
+}
+
+/* Additional styling for buttons */
+input[type="submit"] {
+    background-color: #66ccff;
+    border: none;
+    color: white;
+    padding: 10px 20px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 16px;
+    margin: 4px 2px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+input[type="submit"]:hover {
+    background-color: #0056b3;
+}
