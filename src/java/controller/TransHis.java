@@ -5,6 +5,8 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -13,6 +15,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.List;
 import model.Account;
@@ -37,11 +40,22 @@ public class TransHis extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        response.setContentType("text/html;charset=UTF-8");
-        AccountDAO dao = new AccountDAO();
-        List<trans_history> listTransHis = dao.getTrans();
-        request.setAttribute("listA", listTransHis);        
-        request.getRequestDispatcher("TransHistory.jsp").forward(request, response);
+        HttpSession ss = request.getSession();
+        Account account = (Account) ss.getAttribute("account");
+        
+        if(account == null) {
+            // Nếu chưa đăng nhập, điều hướng đến trang login.jsp
+            response.sendRedirect("login.jsp");
+            return; // Đảm bảo không thực hiện các lệnh khác sau khi điều hướng
+        }
+        
+        TransactionHistoryDAO th = new TransactionHistoryDAO();
+        List<trans_history> listTransHis = th.getTrans(account.getId());
+        String jsonResult = new Gson().toJson(listTransHis);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResult);
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

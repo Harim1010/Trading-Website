@@ -90,10 +90,11 @@ public class Login extends HttpServlet {
                 err = "Invalid captcha";
                 request.setAttribute("err", err);
                 request.getRequestDispatcher("login.jsp").forward(request, response);
-            }        
+            }else{        
             err = "Wrong Username or password";
             request.setAttribute("err", err);
             request.getRequestDispatcher("login.jsp").forward(request, response);
+        }
         }
     }
 

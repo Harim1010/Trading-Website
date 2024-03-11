@@ -4,6 +4,7 @@
  */
 package controller;
 
+import DAO.WalletDAO;
 import DAO.WithdrawalDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -16,6 +17,9 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import model.Wallet;
 import model.Withdrawal;
 
@@ -26,15 +30,8 @@ import model.Withdrawal;
 @WebServlet(name = "WithdrawRequest", urlPatterns = {"/withdraw"})
 public class WithdrawRequest extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
+    private final ScheduledExecutorService scheduler = Executors.newScheduledThreadPool(1);
+
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -74,35 +71,42 @@ public class WithdrawRequest extends HttpServlet {
         xAmount = xAmount.substring(0, xAmount.length() - 2);
         xAmount = xAmount.replace(".", "");
         double amount = Double.parseDouble(xAmount);
-
+        String bankName = request.getParameter("bankName");
+        String bankUser = request.getParameter("bankUser");
+        String bankNumber = request.getParameter("bankNumber");
         String next = "withdrawalList.jsp";
         if (amount > wa.getBalance()) {
             ss.setAttribute("errorWithdraw", "Số tiền bạn vừa yêu cầu đã vượt quá số tiền trong tài khoản, vui lòng thử lại.");
             next = "WithdrawalRequest.jsp";
-        } else {
-            String bankName = request.getParameter("bankName");
-            String bankUser = request.getParameter("bankUser");
-            String bankNumber = request.getParameter("bankNumber");
-
+        }
+        if (amount <= 10000) {
+            ss.setAttribute("errorWithdraw", "Số tiền yêu cầu rút phải trên 10.000 vnđ, vui lòng thử lại.");
+            next = "WithdrawalRequest.jsp";
+        } 
+        if(amount <= wa.getBalance() && amount > 10000){
             Date currentDate = new Date();
             Timestamp time = new Timestamp(currentDate.getTime());
-
             WithdrawalDAO wdb = new WithdrawalDAO();
             Withdrawal w = new Withdrawal(wa.getWallet_id(), amount, time, "In process", bankUser, bankNumber, bankName, time);
             wdb.InsertWithdrawal(w);
+            double newBalance = wa.getBalance() - w.getAmount();
+            wa.setBalance(newBalance); //tru tien trong TK, tam thoi giu tien cho xu ly
+            WalletDAO wadb = new WalletDAO();
+            wadb.UpdateWalletByID(wa);
 
+            //update balance tren thanh header.jsp
+            ss.setAttribute("walletCurrent", wa);
             List<Withdrawal> list = wdb.GetAllWithdrawalByWalletID(wa.getWallet_id());
-            ss.removeAttribute("errorWithdraw");
             ss.setAttribute("listWithdraw", list);
         }
+        scheduler.schedule(() -> {
+            ss.removeAttribute("errorWithdraw");
+        }, 2, TimeUnit.SECONDS);
+
         request.getRequestDispatcher(next).forward(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
+
     @Override
     public String getServletInfo() {
         return "Short description";

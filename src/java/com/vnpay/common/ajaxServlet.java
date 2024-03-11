@@ -5,6 +5,7 @@
  */
 package com.vnpay.common;
 
+import DAO.TransactionHistoryDAO;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
@@ -22,6 +23,9 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
+import java.sql.Timestamp;
+import java.util.Date;
+import model.Account;
 import model.Transaction;
 
 /**
@@ -32,7 +36,6 @@ public class ajaxServlet extends HttpServlet {
 
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-
     }
 
     @Override
@@ -45,7 +48,7 @@ public class ajaxServlet extends HttpServlet {
         xAmount = xAmount.substring(0, xAmount.length() - 2);
         xAmount = xAmount.replace(".", "");
         HttpSession session = req.getSession();
-        int amount1 = Integer.parseInt(xAmount);
+        double amount1 = Double.parseDouble(xAmount);
         long amount = Integer.parseInt(xAmount) * 100;
         //long amount = 10000 * 100;
         //String bankCode = req.getParameter("deposit_method");
@@ -73,7 +76,7 @@ public class ajaxServlet extends HttpServlet {
 //        else {
         vnp_Params.put("vnp_OrderInfo", des);
         if(des.equals("")){
-            vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+            vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang: " + vnp_TxnRef);
         }
 //          }
         vnp_Params.put("vnp_OrderType", orderType);
@@ -87,11 +90,21 @@ public class ajaxServlet extends HttpServlet {
         vnp_Params.put("vnp_ReturnUrl", Config.vnp_ReturnUrl);
         vnp_Params.put("vnp_IpAddr", vnp_IpAddr);
 
+        Date currentDate = new Date();
+        Timestamp createdTimestamp = new Timestamp(currentDate.getTime());
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
-
+        Account acc = (Account) session.getAttribute("account");
+        TransactionHistoryDAO th = new TransactionHistoryDAO();
+        SimpleDateFormat formatter2 = new SimpleDateFormat("yyyy-MM-dd hh:mm:ss");
+        String vnp_time = formatter2.format(cld.getTime());
+        //Timestamp createdTimestamp = Timestamp.valueOf(vnp_time);
+// Sử dụng createdTimestamp thay vì createdDate trong hàm InsertIntoTransactionHistory
+        if(amount1 >= 10000){
+            th.InsertIntoTransactionHistory(acc.getId(), amount1, true, "Completed Deposit", acc.getName(), createdTimestamp, createdTimestamp);
+        }
         cld.add(Calendar.MINUTE, 15);
         String vnp_ExpireDate = formatter.format(cld.getTime());
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
@@ -123,7 +136,7 @@ public class ajaxServlet extends HttpServlet {
         String vnp_SecureHash = Config.hmacSHA512(Config.secretKey, hashData.toString());
         queryUrl += "&vnp_SecureHash=" + vnp_SecureHash;
         String paymentUrl = Config.vnp_PayUrl + "?" + queryUrl;
-        
+
         resp.sendRedirect(paymentUrl);
 
 //        com.google.gson.JsonObject job = new JsonObject();

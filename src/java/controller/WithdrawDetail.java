@@ -81,33 +81,26 @@ public class WithdrawDetail extends HttpServlet {
         xAmount = xAmount.substring(0, xAmount.length() - 2);
         xAmount = xAmount.replace(".", "");
         double amount = Double.parseDouble(xAmount);
-        
+
         String bankName = request.getParameter("bankName");
         String bankUser = request.getParameter("bankUser");
         String bankNumber = request.getParameter("bankNumber");
-        
+
         w.setBank_user(bankUser);
         w.setBank_number(bankNumber);
         w.setBank_name(bankName);
 
-        String next = "withdrawalList.jsp";
-        if (amount > wa.getBalance()) {
-            ss.setAttribute("withdrawCurrent", w);
-            ss.setAttribute("errorWithdraw", "Số tiền bạn vừa yêu cầu đã vượt quá số tiền trong tài khoản, vui lòng thử lại.");
-            next = "WithdrawalDetail.jsp";
-        } else {
-            w.setAmount(amount);
-            Date currentDate = new Date();
-            Timestamp time = new Timestamp(currentDate.getTime());
-            w.setUpdate_datetime(time);
-            WithdrawalDAO wdb = new WithdrawalDAO();
-            wdb.UpdateWithdrawalByID(w);
+        Date currentDate = new Date();
+        Timestamp time = new Timestamp(currentDate.getTime());
+        w.setUpdate_datetime(time);
+        WithdrawalDAO wdb = new WithdrawalDAO();
+        wdb.UpdateWithdrawalByID(w);
 
-            List<Withdrawal> list = wdb.GetAllWithdrawalByWalletID(wa.getWallet_id());
-            ss.removeAttribute("errorWithdraw");
-            ss.setAttribute("listWithdraw", list);
-        }
-        request.getRequestDispatcher(next).forward(request, response);
+        List<Withdrawal> list = wdb.GetAllWithdrawalByWalletID(wa.getWallet_id());
+        ss.removeAttribute("errorWithdraw");
+        ss.setAttribute("listWithdraw", list);
+
+        request.getRequestDispatcher("withdrawalList.jsp").forward(request, response);
 
     }
 

@@ -10,11 +10,14 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.IntermediaryOrder;
+import model.Wallet;
 
 /**
  *
@@ -40,7 +43,7 @@ public class IntermediaryPublicMarket extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet IntermediaryPublicMarket</title>");            
+            out.println("<title>Servlet IntermediaryPublicMarket</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet IntermediaryPublicMarket at " + request.getContextPath() + "</h1>");
@@ -61,12 +64,27 @@ public class IntermediaryPublicMarket extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int uId = Integer.parseInt(request.getParameter("accountId"));
+        HttpSession ss = request.getSession();
+
+        Wallet w = new Wallet();
+        w = (Wallet) ss.getAttribute("walletCurrent");
+
+        Account acc = new Account();
+        acc = (Account) ss.getAttribute("account");
+        
         IntermediaryOrderDAO oDAO = new IntermediaryOrderDAO();
         List<IntermediaryOrder> listIntermediaryOrder = new ArrayList<>();
         listIntermediaryOrder = oDAO.getAllIntermediaryOrder();
+
+        if (w != null) {
+            double currentBalance = w.getBalance();
+            request.setAttribute("currentBalance", currentBalance);
+        }
         request.setAttribute("listOrder", listIntermediaryOrder);
-        request.setAttribute("uId", uId);
+        if (acc != null) {
+            int uId = acc.getId();
+            request.setAttribute("accountId", uId);
+        }
         request.getRequestDispatcher("IntermediaryPublicMarket.jsp").forward(request, response);
     }
 

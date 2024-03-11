@@ -5,14 +5,17 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.trans_history;
 
 /**
@@ -35,11 +38,13 @@ public class filter extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
+            HttpSession ss = request.getSession();
             String id = request.getParameter("filterMaGiaoDich");
             int iId = Integer.parseInt(id);
-            AccountDAO dao = new AccountDAO();
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
             List<trans_history> listTransHis;
-            listTransHis = dao.getTransById(iId);
+            Account account = (Account) ss.getAttribute("account");
+            listTransHis = th.getTransById(account.getId(), iId);
             request.setAttribute("listA", listTransHis);
             request.setAttribute("giaodich", iId);
             request.getRequestDispatcher("TransHistory.jsp").forward(request, response);
@@ -59,7 +64,37 @@ public class filter extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        processRequest(request, response);
+        try ( PrintWriter out = response.getWriter()) {
+            HttpSession ss = request.getSession();
+            String id = request.getParameter("filterMaGiaoDich");
+            int iId = Integer.parseInt(id);
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
+            List<trans_history> listTransHis;
+            Account account = (Account) ss.getAttribute("account");
+
+            // Thực hiện tìm kiếm dữ liệu dựa trên filterMaGiaoDich
+            listTransHis = th.getTransById(account.getId(), iId);
+
+            // Trả về kết quả dưới dạng HTML
+            response.setContentType("text/html;charset=UTF-8");
+            for (trans_history o : listTransHis) {
+                out.println("<tr id=\"content\">");
+                out.println("<td style=\"text-align: center;\">" + o.getId() + "</td>");
+                out.println("<td style=\"text-align: center;\">" + o.getMoney() + "</td>");
+                out.println("<td style=\"text-align: center;\">" + (o.isType() == false ? '-' : '+') + "</td>");
+                out.println("<td style=\"text-align: center;\">" + (o.isWork() == false ? "Unprocessed" : "Processed") + "</td>");
+                out.println("<td>" + o.getNote() + "</td>");
+                out.println("<td>" + o.getCreate_by() + "</td>");
+                out.println("<td>" + o.getCreate_at() + "</td>");
+                out.println("<td>" + o.getUpdate_at() + "</td>");
+                out.println("<td>");
+                out.println("<button style=\"background-color: #4dbd74\" class=\"details\" data-id=\"" + o.getId() + "\" data-toggle=\"modal\">");
+                out.println("Details");
+                out.println("</button>");
+                out.println("</td>");
+                out.println("</tr>");
+            }
+        }
     }
 
     /**

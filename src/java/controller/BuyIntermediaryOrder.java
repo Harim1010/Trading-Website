@@ -5,15 +5,18 @@
 package controller;
 
 import DAO.IntermediaryOrderDAO;
+import DAO.WalletDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.IntermediaryOrder;
 
 /**
@@ -61,16 +64,36 @@ public class BuyIntermediaryOrder extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int oId = Integer.parseInt(request.getParameter("oId"));
-        int uId = Integer.parseInt(request.getParameter("uId"));
-        int price = Integer.parseInt(request.getParameter("price"));
-        IntermediaryOrderDAO oDAO = new IntermediaryOrderDAO();
-        oDAO.buyIntermediaryOrder(oId, uId, price);
-        List<IntermediaryOrder> listIntermediaryOrder = new ArrayList<>();
-        listIntermediaryOrder = oDAO.getAllMyIntermediaryOrder(uId);
-        request.setAttribute("listOrder", listIntermediaryOrder);
-        request.setAttribute("accountId", uId);
-        request.getRequestDispatcher("MyIntermediaryOrder.jsp").forward(request, response);
+        HttpSession ss = request.getSession();
+        Account acc = (Account) ss.getAttribute("account");
+        WalletDAO wDAO = new WalletDAO();
+        
+        IntermediaryOrderDAO interOrderDAO = new IntermediaryOrderDAO();
+        IntermediaryOrder interOrder = new IntermediaryOrder();
+        if (acc != null) {
+            int oId = Integer.parseInt(request.getParameter("oId"));
+
+            interOrder = interOrderDAO.getIntermediaryOrderById(oId);
+            String orderStatus = interOrder.getOrder_status();
+            if (!orderStatus.equals("ready to trade")) {
+                request.setAttribute("error", "Đơn hàng đã được mua");
+                request.getRequestDispatcher("ErrorAction.jsp").forward(request, response);
+            } else {
+                int uId = acc.getId();
+                double price = Double.parseDouble(request.getParameter("price"));
+                IntermediaryOrderDAO oDAO = new IntermediaryOrderDAO();
+                if (oDAO.buyIntermediaryOrder(oId, uId, price)) {
+                    ss.setAttribute("walletCurrent", wDAO.GetWalletByID(uId));
+                }
+                List<IntermediaryOrder> listIntermediaryOrder = new ArrayList<>();
+                listIntermediaryOrder = oDAO.getAllMyIntermediaryOrder(uId);
+                request.setAttribute("listOrder", listIntermediaryOrder);
+                request.setAttribute("accountId", uId);
+                request.getRequestDispatcher("MyIntermediaryOrder.jsp").forward(request, response);
+            }
+        } else {
+            response.sendRedirect("ErrorNotFound.jsp");
+        }
     }
 
     /**
