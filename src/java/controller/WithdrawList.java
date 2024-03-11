@@ -5,6 +5,8 @@
 
 package controller;
 
+import DAO.AccountDAO;
+import DAO.WalletDAO;
 import DAO.WithdrawalDAO;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -15,6 +17,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.util.List;
+import model.Account;
 import model.Wallet;
 import model.Withdrawal;
 
@@ -36,9 +39,16 @@ public class WithdrawList extends HttpServlet {
     throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         HttpSession ss = request.getSession();
-        Wallet wa = (Wallet) ss.getAttribute("walletCurrent");
+        
+        String xAccountID = request.getParameter("accountId");
+        int accID = Integer.parseInt(xAccountID);
+        
+        WalletDAO wadb = new WalletDAO(); 
+        Wallet wa = wadb.GetWalletByUserID(accID);       
+        
         WithdrawalDAO wdb = new WithdrawalDAO();
         List<Withdrawal> list = wdb.GetAllWithdrawalByWalletID(wa.getWallet_id());
+
         ss.setAttribute("listWithdraw", list);
         request.getRequestDispatcher("withdrawalList.jsp").forward(request, response);
     } 

@@ -5,6 +5,7 @@
 package controller;
 
 import DAO.AccountDAO;
+import com.google.gson.Gson;
 
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import static java.util.Collections.list;
 import java.util.List;
 import model.Account;
 
@@ -37,8 +39,14 @@ public class managerAccount extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         AccountDAO dao = new AccountDAO();
         List<Account> listAccount = dao.getallacc();
-        request.setAttribute("listA", listAccount);
-        request.getRequestDispatcher("ManagerCustomer.jsp").forward(request, response);
+        
+        
+        String jsonResult = new Gson().toJson(listAccount);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("UTF-8");
+        response.getWriter().write(jsonResult);
+       
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">

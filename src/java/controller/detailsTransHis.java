@@ -5,6 +5,7 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
 
 import java.io.IOException;
 
@@ -13,6 +14,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.PrintWriter;
 import java.util.List;
 import model.Account;
@@ -44,8 +46,10 @@ public class detailsTransHis extends HttpServlet {
             // Giả sử bạn đã lấy được thông tin và muốn trả về dữ liệu
             response.setContentType("text/plain");
             response.setCharacterEncoding("UTF-8");
-            AccountDAO dao = new AccountDAO();
-            trans_history transaction = dao.getDetailsTransById(iId); // Assuming you want to fetch by ID 0, but typically you'd get this ID from a request parameter
+            HttpSession ss = request.getSession();
+            Account account = (Account) ss.getAttribute("account");
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
+            trans_history transaction = th.getDetailsTransById(account.getId(), iId); // Assuming you want to fetch by ID 0, but typically you'd get this ID from a request parameter
 
             request.setAttribute("listB", transaction); // Setting the transaction history object as an attribute
             request.getRequestDispatcher("TransHistory.jsp").forward(request, response); // Forwarding to JSP
@@ -80,9 +84,10 @@ public class detailsTransHis extends HttpServlet {
             throws ServletException, IOException {
         String id = request.getParameter("id");
         int transactionId = Integer.parseInt(id);
-        
-        AccountDAO dao = new AccountDAO();
-        trans_history transaction = dao.getDetailsTransById(transactionId);
+        HttpSession ss = request.getSession();
+        Account account = (Account) ss.getAttribute("account");
+        TransactionHistoryDAO th = new TransactionHistoryDAO();
+        trans_history transaction = th.getDetailsTransById(account.getId(), transactionId);
 
         // Trả về dữ liệu dưới dạng văn bản
         response.setContentType("text/plain");
@@ -90,58 +95,58 @@ public class detailsTransHis extends HttpServlet {
 
         // Chuyển đổi dữ liệu thành dạng văn bản và gửi lại cho client
         response.getWriter().print(" <tr>\n"
-                + "                                                <td style=\"padding-left: 40px\">\n"
+                + "                                                <td style=\"padding-left: 18px\">\n"
                 + "                                                    Money\n"
                 + "                                                </td>\n"
-                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \""+transaction.getMoney()+"\" readonly style=\"background-color:#cccccc; width: 615px \" ></div></td>\n"
+                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \"" + transaction.getMoney() + "\" readonly style=\"background-color:#cccccc; width: 590px \" ></div></td>\n"
                 + "                                            </tr>\n"
                 + "                                            <tr>\n"
-                + "                                                <td style=\"padding-left: 40px\">\n"
+                + "                                                <td style=\"padding-left: 18px\">\n"
                 + "                                                    Transaction type\n"
                 + "                                                </td>\n"
                 + "                                                <td class=\"button\">\n"
-                + "                                                    <div style=\"width: 310px\">\n"
-                + "                                                        <input type=\"radio\" id=\"money1\" value=\"\" name=\"+\" required \">\n"
+                + "                                                    <div style=\"width: 280px\">\n"
+                + "                                                        <input type=\"radio\" id=\"money1\" value=\"\" name=\"+\" required checked disabled \">\n"
                 + "                                                        <label for=\"money1\">-</label>\n"
                 + "                                                    </div>\n"
                 + "                                                </td>\n"
                 + "                                                <td class=\"button\">\n"
-                + "                                                    <div style=\"width: 310px\">\n"
-                + "                                                        <input type=\"radio\" id=\"money2\" value=\"chuyenkhoan\" name=\"+\" required checked>\n"
+                + "                                                    <div style=\"width: 280px\">\n"
+                + "                                                        <input type=\"radio\" id=\"money2\" value=\"chuyenkhoan\" name=\"+\" required checked disabled>\n"
                 + "                                                        <label for=\"money2\">+</label>\n"
                 + "                                                    </div>\n"
                 + "                                                </td>\n"
                 + "                                            </tr>\n"
                 + "                                            <tr>\n"
-                + "                                                <td style=\"padding-left: 40px\">\n"
+                + "                                                <td style=\"padding-left: 18px\">\n"
                 + "                                                    Processed\n"
                 + "                                                </td>\n"
                 + "                                                <td class=\"button\">\n"
-                + "                                                    <div style=\"width: 310px\">\n"
-                + "                                                        <input type=\"radio\" id=\"chuaxuly\" value=\"\" name=\"xuly\" readonly required style=\"\">\n"
+                + "                                                    <div style=\"width: 280px\">\n"
+                + "                                                        <input type=\"radio\" id=\"chuaxuly\" value=\"\" name=\"xuly\" readonly required disabled>\n"
                 + "                                                        <label for=\"chuaxuly\">Unprocessed</label>\n"
                 + "                                                    </div>\n"
                 + "                                                </td>\n"
                 + "                                                <td class=\"button\">\n"
-                + "                                                    <div style=\"width: 310px\">\n"
-                + "                                                        <input type=\"radio\" id=\"daxuly\" value=\"\" name=\"xuly\" readonly required checked \">\n"
+                + "                                                    <div style=\"width: 280px\">\n"
+                + "                                                        <input type=\"radio\" id=\"daxuly\" value=\"\" name=\"xuly\" readonly required checked disabled \">\n"
                 + "                                                        <label for=\"daxuly\"  >Processed</label>\n"
                 + "                                                    </div>\n"
                 + "                                                </td>\n"
                 + "                                            </tr>\n"
                 + "                                            <tr>\n"
-                + "                                                <td style=\"padding-left: 40px\">\n"
+                + "                                                <td style=\"padding-left: 18px\">\n"
                 + "                                                    Note\n"
                 + "                                                </td>\n"
-                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \""+transaction.getNote()+"\" readonly style=\"background-color:#cccccc;width: 615px \" ></div></td>\n"
+                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \"" + transaction.getNote() + "\" readonly style=\"background-color:#cccccc;width: 590px \" ></div></td>\n"
                 + "                                            </tr>\n"
                 + "                                            <tr>\n"
-                + "                                                <td style=\"padding-left: 40px\">\n"
+                + "                                                <td style=\"padding-left: 18px\">\n"
                 + "                                                    Transaction creator\n"
                 + "                                                </td>\n"
-                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \""+transaction.getCreate_by()+"\" readonly style=\"background-color:#cccccc; width: 615px\" ></div></td>\n"
+                + "                                                <td><div style=\"width: 100px;\"><input type=\"text\" value= \"" + transaction.getCreate_by() + "\" readonly style=\"background-color:#cccccc; width: 590px\" ></div></td>\n"
                 + "                                            </tr>");
-        
+
     }
 
     /**

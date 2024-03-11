@@ -5,14 +5,17 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.trans_history;
 
 /**
@@ -36,10 +39,11 @@ public class filterMoney extends HttpServlet {
         try ( PrintWriter out = response.getWriter()) {
             String sotien = request.getParameter("soTien");
             int iSoTien = Integer.parseInt(sotien);
-            AccountDAO dao = new AccountDAO();
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
             List<trans_history> listTransHis;
-
-            listTransHis = dao.getTransByMoney(iSoTien);
+            HttpSession ss = request.getSession();
+            Account account = (Account) ss.getAttribute("account");
+            listTransHis = th.getTransByMoney(account.getId(), iSoTien);
 
             request.setAttribute("listA", listTransHis);
             request.setAttribute("money", iSoTien);

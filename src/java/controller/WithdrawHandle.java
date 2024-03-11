@@ -4,6 +4,7 @@
  */
 package controller;
 
+import DAO.TransactionHistoryDAO;
 import DAO.WalletDAO;
 import DAO.WithdrawalDAO;
 import java.io.IOException;
@@ -17,6 +18,7 @@ import jakarta.servlet.http.HttpSession;
 import java.sql.Timestamp;
 import java.util.Date;
 import java.util.List;
+import model.Account;
 import model.Wallet;
 import model.Withdrawal;
 
@@ -50,13 +52,14 @@ public class WithdrawHandle extends HttpServlet {
 
         String action = request.getParameter("action");
         if (action.equals("accept")) {
-            double newBalance = wa.getBalance() - w.getAmount();
-            wa.setBalance(newBalance); //tru tien trong TK, coi nhu da rut
-            wadb.UpdateWalletByID(wa);
             w.setStatus("Finished");
         } else if (action.equals("deny")) {
             w.setStatus("Denied");
+            double newBalance = wa.getBalance() + w.getAmount();
+            wa.setBalance(newBalance); // tra lai tien khi don yeu cau bi tu choi
+            wadb.UpdateWalletByID(wa);
         }
+        
         Date currentDate = new Date();
         Timestamp time = new Timestamp(currentDate.getTime());
         w.setUpdate_datetime(time);
@@ -66,6 +69,19 @@ public class WithdrawHandle extends HttpServlet {
         Wallet wa2 = (Wallet) ss.getAttribute("walletCurrent");
         if(wa.getWallet_id() == wa2.getWallet_id()){
             ss.setAttribute("walletCurrent", wa);
+        }
+        Account account = (Account) ss.getAttribute("account");
+        TransactionHistoryDAO th = new TransactionHistoryDAO();
+        if (action.equals("accept")) {
+            // Kiểm tra xem account.getId() có bằng wa.getWallet_id() không
+            if (account.getId() == wa.getWallet_id()) {
+                // Nếu giống nhau, chỉ chèn một lần
+                th.InsertIntoTransactionHistory(account.getId(), w.getAmount(), false, "withdraw money", w.getBank_user(), w.getCreate_datetime(), w.getUpdate_datetime());
+            } else {
+                // Nếu không giống nhau, chèn vào cả hai tài khoản
+                th.InsertIntoTransactionHistory(account.getId(), w.getAmount(), false, "withdraw money", w.getBank_user(), w.getCreate_datetime(), w.getUpdate_datetime());
+                th.InsertIntoTransactionHistory(wa.getWallet_id(), w.getAmount(), false, "withdraw money", w.getBank_user(), w.getCreate_datetime(), w.getUpdate_datetime());
+            }
         }
 
         List<Withdrawal> list = wdb.GetAllWithdrawal();
@@ -114,6 +130,9 @@ public class WithdrawHandle extends HttpServlet {
             w.setStatus("Finished");
         } else if (action.equals("deny")) {
             w.setStatus("Denied");
+            double newBalance = wa.getBalance() + w.getAmount();
+            wa.setBalance(newBalance); // tra lai tien khi don yeu cau bi tu choi
+            wadb.UpdateWalletByID(wa);
         } else if (action.equals("error")) {
             w.setStatus("Error");
         }

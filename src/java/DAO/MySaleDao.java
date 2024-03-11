@@ -24,10 +24,9 @@ public class MySaleDao {
     public PreparedStatement ps = null;
     public ResultSet rs = null;
 
-
     public List<Intermediary_order> GetAllIntermediary_seller(int id) {
         List<Intermediary_order> list = new ArrayList<>();
-        String sql = "SELECT * FROM dtb_demo.intermediary_order where account_sold_id =?";
+        String sql = "SELECT * FROM dtb_demo.intermediary_order where account_sold_id =? order by id desc";
         try {
             con = new DBContext().connection;
             ps = con.prepareStatement(sql);
@@ -69,7 +68,7 @@ public class MySaleDao {
             rs = ps.executeQuery();
             while (rs.next()) {
                 Intermediary_order io = new Intermediary_order();
-               io.setId(rs.getInt(1));
+                io.setId(rs.getInt(1));
                 io.setDescription(rs.getString(2));
                 io.setPrice(rs.getDouble(3));
                 io.setFee_type(rs.getBoolean(4));
@@ -238,9 +237,74 @@ public class MySaleDao {
         return null;
     }
 
+    public int GetLastID() {
+        String sql = "select id from intermediary_order order by id desc limit 1";
+        int id = 0;
+        try {
+            con = new DBContext().connection;
+            ps = con.prepareCall(sql);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                id = rs.getInt("id");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return id;
+    }
+
+    public void UpDateLink(String link, int id) {
+        String sql = "update intermediary_order set link_to = ? where id = ?";
+        try {
+            con = new DBContext().connection;
+            ps = con.prepareCall(sql);
+            ps.setString(1, link);
+            ps.setInt(2, id);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public String GetBuyerName(int id) {
+        String username = "";
+        String sql = "select account.username from intermediary_order join account "
+                + "on intermediary_order.account_buy_id=account.id where intermediary_order.id = ?";
+        try {
+            con = new DBContext().connection;
+            ps = con.prepareCall(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                username = rs.getString("username");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return username;
+    }
+    
+        public String GetSellerName(int id) {
+        String username = "";
+        String sql = "select account.username from intermediary_order join account "
+                + "on intermediary_order.account_sold_id=account.id where intermediary_order.id = ?";
+        try {
+            con = new DBContext().connection;
+            ps = con.prepareCall(sql);
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+            if (rs.next()) {
+                username = rs.getString("username");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return username;
+    }
+
     public static void main(String[] args) {
         MySaleDao msd = new MySaleDao();
-        List<Intermediary_order> list = msd.GetAllIntermediary_seller(4);
-  
+        System.out.println(msd.GetBuyerName(92));
+
     }
 }

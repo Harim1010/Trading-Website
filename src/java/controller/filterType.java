@@ -5,14 +5,17 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.trans_history;
 
 /**
@@ -35,17 +38,21 @@ public class filterType extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         try ( PrintWriter out = response.getWriter()) {
             String type = request.getParameter("type");
-            AccountDAO dao = new AccountDAO();
-            List<trans_history> listTransHis;
 
-// Kiểm tra xem người dùng đã chọn loại giao dịch là gì
-            if ("-".equals(type)) {
-                listTransHis = dao.getTransByType(false); // Lấy các giao dịch Positive
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
+            String sta = request.getParameter("statment");
+            ArrayList<trans_history> listTransHis;
+            HttpSession ss = request.getSession();
+            Account account = (Account) ss.getAttribute("account");
+            if (type.equals("-")) {
+                listTransHis = th.getTransByBoolean(account.getId(), false, sta);
             } else {
-                listTransHis = dao.getTransByType(true); // Lấy các giao dịch Negative
-            } 
+                listTransHis = th.getTransByBoolean(account.getId(), true, sta);
+            }
+// Kiểm tra xem người dùng đã chọn loại giao dịch là gì
             request.setAttribute("listA", listTransHis);
             request.getRequestDispatcher("TransHistory.jsp").forward(request, response);
+
         }
     }
 

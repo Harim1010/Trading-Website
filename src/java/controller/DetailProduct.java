@@ -11,6 +11,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import model.*;
@@ -60,9 +61,32 @@ public class DetailProduct extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         MySaleDao msd = new MySaleDao();
-        Intermediary_order io = msd.GetOrderByID(Integer.parseInt(request.getParameter("id")));
-        request.setAttribute("io", io);
-        request.getRequestDispatcher("DetailProduct.jsp").forward(request, response);
+        PrintWriter out = response.getWriter();
+        HttpSession ss = request.getSession();
+        int id = Integer.parseInt(request.getParameter("id"));
+        Account acc = (Account) ss.getAttribute("account");
+        Intermediary_order io = msd.GetOrderByID(id);
+        String buyername = msd.GetBuyerName(id);
+        String sellername =msd.GetSellerName(id);
+        if (acc == null) {
+            response.sendRedirect("login.jsp");
+        } else {
+            if (acc.getId() == io.getAccount_sold_id()) {
+                request.setAttribute("io", io);
+                request.setAttribute("buyername", buyername);
+                request.setAttribute("sellername", sellername);
+                request.getRequestDispatcher("DetailProduct.jsp").forward(request, response);
+            }else{
+                if(acc.getId() != io.getAccount_buy_id() && !io.getOrder_status().equals("ready to trade")){
+                    response.sendRedirect("ErrorNotFound.jsp");
+                }else{
+                request.setAttribute("io", io);
+                request.setAttribute("buyername", buyername);
+                request.setAttribute("sellername", sellername);
+                request.getRequestDispatcher("ViewDetailProduct.jsp").forward(request, response);
+                }
+            }
+        }
     }
 
     /**
@@ -87,15 +111,17 @@ public class DetailProduct extends HttpServlet {
         SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         Date currentDate = new Date();
         String updatedtime = dateFormat.format(currentDate);
+        double intermediary_fee = price *0.05;
         MySaleDao msd = new MySaleDao();
         Intermediary_order io = msd.GetOrderByID(Integer.parseInt(request.getParameter("id")));
         io.setTitle(title);
         io.setPrice(price);
-        io.setFee_type(feetype.equals("1")?true:false);
+        io.setFee_type(feetype.equals("1") ? true : false);
         io.setDescription(descrip);
         io.setContact(contact);
+        io.setIntermediary_fee(intermediary_fee);
         io.setHide_description(hide);
-        io.setPublic_status(publicstatus.equals("1")?true:false);
+        io.setPublic_status(publicstatus.equals("1") ? true : false);
         io.setUpdated_at(updatedtime);
         msd.UpdateProduct(io);
         request.setAttribute("io", io);

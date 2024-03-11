@@ -9,7 +9,6 @@ package model;
  * @author Admin
  */
 public class Wallet {
-
     private int wallet_id;
     private int user_id;
     private double balance;
@@ -35,6 +34,7 @@ public class Wallet {
         this.wallet_id = wallet_id;
     }
 
+
     public int getUser_id() {
         return user_id;
     }
@@ -50,10 +50,6 @@ public class Wallet {
     public void setBalance(double balance) {
         this.balance = balance;
     }
-
-    @Override
-    public String toString() {
-        return "Wallet{" + "wallet_id=" + wallet_id + ", user_id=" + user_id + ", balance=" + balance + '}';
-    }
-
+    
+    
 }

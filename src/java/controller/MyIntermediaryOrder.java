@@ -10,12 +10,13 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.IntermediaryOrder;
-
 
 /**
  *
@@ -62,13 +63,20 @@ public class MyIntermediaryOrder extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        int uId = Integer.parseInt(request.getParameter("accountId"));
-        IntermediaryOrderDAO oDAO = new IntermediaryOrderDAO();
-        List<IntermediaryOrder> listIntermediaryOrder = new ArrayList<>();
-        listIntermediaryOrder = oDAO.getAllMyIntermediaryOrder(uId);
-        request.setAttribute("listOrder", listIntermediaryOrder);
-        request.setAttribute("uId", uId);
-        request.getRequestDispatcher("MyIntermediaryOrder.jsp").forward(request, response);
+        HttpSession ss = request.getSession();
+        Account acc = (Account) ss.getAttribute("account");
+        
+        if (acc != null) {
+            int uId = acc.getId();
+            IntermediaryOrderDAO oDAO = new IntermediaryOrderDAO();
+            List<IntermediaryOrder> listIntermediaryOrder = new ArrayList<>();
+            listIntermediaryOrder = oDAO.getAllMyIntermediaryOrder(uId);
+            request.setAttribute("listOrder", listIntermediaryOrder);
+            request.setAttribute("accountId", uId);
+            request.getRequestDispatcher("MyIntermediaryOrder.jsp").forward(request, response);
+        } else {
+            response.sendRedirect("ErrorNotFound.jsp");
+        }
     }
 
     /**

@@ -5,14 +5,17 @@
 package controller;
 
 import DAO.AccountDAO;
+import DAO.TransactionHistoryDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.List;
+import model.Account;
 import model.trans_history;
 
 /**
@@ -36,8 +39,10 @@ public class filterNote extends HttpServlet {
         try ( PrintWriter out = response.getWriter()) {
             /* TODO output your page here. You may use following sample code. */
             String note = request.getParameter("note");
-            AccountDAO dao = new AccountDAO();
-            List<trans_history> listTransHis = dao.getTransByNote(note);
+            HttpSession ss = request.getSession();
+            Account account = (Account) ss.getAttribute("account");
+            TransactionHistoryDAO th = new TransactionHistoryDAO();
+            List<trans_history> listTransHis = th.getTransByNote(account.getId(),note);
             request.setAttribute("listA", listTransHis);
             request.setAttribute("note", note);
             request.getRequestDispatcher("TransHistory.jsp").forward(request, response);
